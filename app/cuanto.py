@@ -38,11 +38,46 @@ CUANTO_MCP_URL = os.environ.get(
 _TIMEOUT = httpx.Timeout(20.0, connect=5.0)
 _ids = itertools.count(1)
 
-# Session-state keys the frontend listens for (see frontend lib/agentStream.ts).
+# Session-state keys the frontend listens for (see frontend lib/picks.ts).
 UI_CUANTO_PRODUCTS = "ui_cuanto_products"
 UI_CUANTO_MERCHANTS = "ui_cuanto_merchants"
 
 MAX_PRODUCTS_TO_MODEL = 15
+
+# --- Content safety ---------------------------------------------------------
+# The partner feed does not set `adult` reliably (adult stores are filed under
+# "Health & Beauty"), and keyword search routes everyday queries such as "toy"
+# or "massager" to them. Block known adult merchants plus explicit terms.
+# Extra merchants can be blocked via CUANTO_BLOCKED_MERCHANTS (comma-separated,
+# case-insensitive substrings of the merchant name or website).
+_BLOCKED_MERCHANTS = {"adorime"} | {
+    m.strip().lower()
+    for m in os.environ.get("CUANTO_BLOCKED_MERCHANTS", "").split(",")
+    if m.strip()
+}
+_ADULT_TERMS = re.compile(
+    r"(dildo|vibrat(or|ing egg)|sex(ual)?\s?(toy|wellness)|sex|clit|g-?spot|"
+    r"anal|butt\s?plug|masturbat|stroker|penis|erotic|bdsm|bondage|fetish|"
+    r"strap-?on|nipple|orgasm|arous|lubricant|lube|condom|porn|"
+    r"adult\s?toy|wand massager|suction (toy|stimulator)|kegel|cock\s?ring)",
+    re.IGNORECASE,
+)
+
+
+def _is_blocked(item: dict[str, Any]) -> bool:
+    """True for adult / unsafe items that must never be recommended."""
+    if item.get("adult") is True or str(item.get("adult")).lower() == "true":
+        return True
+    merchant = " ".join(
+        str(item.get(k) or "") for k in ("seller_name", "seller_url")
+    ).lower()
+    if any(b in merchant for b in _BLOCKED_MERCHANTS):
+        return True
+    text = " ".join(
+        str(item.get(k) or "")
+        for k in ("title", "short_title", "description", "product_type")
+    )
+    return bool(_ADULT_TERMS.search(text))
 
 
 def _token() -> str | None:
@@ -159,7 +194,11 @@ async def _search_one(
         if key in seen:
             continue
         seen.add(key)
-        items = await _call_tool(client, "search_products", args)
+        items = [
+            p
+            for p in await _call_tool(client, "search_products", args)
+            if not _is_blocked(p)
+        ]
         if items:
             return items
     return []
@@ -291,6 +330,8 @@ async def search_cuanto_merchants(
 
     cards, slims = [], []
     for m in items:
+        if _is_blocked(m):
+            continue
         url = m.get("redirect_url") or (m.get("best_offer") or {}).get("redirect_url")
         if not url or not m.get("merchant_uuid"):
             continue

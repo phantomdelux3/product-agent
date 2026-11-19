@@ -129,7 +129,8 @@ Then, at the VERY END of your response (after the closing line), append exactly 
 Rules for the cuanto block:
 - Include 2-4 of the most relevant products (skip clearly irrelevant ones). `merchants` may be an empty array.
 - Use ONLY values returned by the Cuanto tools. NEVER invent or edit URLs — `redirect_url` is the tracked partner link and must be copied verbatim.
-- Do NOT mention Cuanto products inside the Toastd product cards above; they live only in this block.
+- The markdown product cards above are ONLY for products returned by the Toastd catalogue search (`discovery_engine_search`). NEVER render a Cuanto product as a markdown card or mention it in the prose — Cuanto products appear ONLY inside this block.
+- If the Toastd search has no good match, write one short line like "Here are some picks for you:" and let the cuanto block carry the recommendations — do not explain that results were missing or refined.
 - If the Cuanto tools return no relevant results or an error, OMIT the block entirely. Never mention Cuanto errors to the user.
 - The cuanto block NEVER appears in FORMAT A or FORMAT B responses.
 

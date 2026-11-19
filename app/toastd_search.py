@@ -193,7 +193,6 @@ async def search_toastd_products(
             seen.add(b[i].id)
             parsed = _to_card_and_slim(b[i])
             if parsed:
-                parsed[0]["query"] = queries[qi] if len(lists) == len(queries) else ""
                 cards.append(parsed[0])
                 slims.append(parsed[1])
             if len(slims) >= MAX_PRODUCTS_TO_MODEL:

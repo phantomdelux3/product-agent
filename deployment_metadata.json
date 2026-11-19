@@ -2,5 +2,12 @@
   "remote_agent_runtime_id": "projects/698151665057/locations/us-central1/reasoningEngines/8982788447336923136",
   "deployment_target": "agent_runtime",
   "is_a2a": false,
-  "deployment_timestamp": "2026-11-19T12:53:01.785868+00:00"
+  "deployment_timestamp": "2026-11-19T13:14:58.427374+00:00",
+  "pending_operation": {
+    "operation_name": "projects/698151665057/locations/us-central1/reasoningEngines/8982788447336923136/operations/9206335082707550208",
+    "project": "toastd",
+    "location": "us-central1",
+    "deployment_target": "agent_runtime",
+    "started_at": "2026-11-19T13:16:53.581089+00:00"
+  }
 }

@@ -56,9 +56,9 @@ _BLOCKED_MERCHANTS = {"adorime"} | {
     if m.strip()
 }
 _ADULT_TERMS = re.compile(
-    r"(dildo|vibrat(or|ing egg)|sex(ual)?\s?(toy|wellness)|sex|clit|g-?spot|"
-    r"anal|butt\s?plug|masturbat|stroker|penis|erotic|bdsm|bondage|fetish|"
-    r"strap-?on|nipple|orgasm|arous|lubricant|lube|condom|porn|"
+    r"\b(dildo|vibrat(or|ing egg)|sex(ual)?\s?(toy|wellness)|sex\b|clit|g-?spot|"
+    r"anal\b|butt\s?plug|masturbat|stroker|penis|erotic|bdsm|bondage|fetish|"
+    r"strap-?on|nipple|orgasm|arous|lubricant|lube\b|condom|porn|"
     r"adult\s?toy|wand massager|suction (toy|stimulator)|kegel|cock\s?ring)",
     re.IGNORECASE,
 )
